@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="http://localhost:8080/socket.io/socket.io.js"></script>
+    <script>
+       var socket = io();
+       var name = prompt("Enter your name")
+       socket.on('message',(data)=>{
+           let box = document.getElementById("msgBox")
+           box.innerText = data
+       })
+       socket.emit("joinchat",name)
+       socket.on('chat',(data)=>{
+           let p = document.createElement('p')
+           p.innerText = data.data
+           let chatBox = document.getElementById('chatBox')
+           chatBox.appendChild(p)
+       })
+       socket.on('newUserJoin',(username)=>{
+        let p = document.createElement('p')
+           p.innerText = username+" join the chat"
+           p.style = "text-align:center"
+           let chatBox = document.getElementById('chatBox')
+           chatBox.appendChild(p)
+       })
+       function sendMessage(){
+           var msg = document.getElementById("msgbox").value;
+           document.getElementById("msgbox").value = ""
+           let p = document.createElement('p')
+           p.innerText = "you : "+msg
+           p.style = "text-align:right; padding: 0px 15px"
+           console.log(p)
+           let chatBox = document.getElementById('chatBox')
+           chatBox.appendChild(p)
+           socket.emit('sendMsg',msg)
+
+       }
+       socket.on('reciveNewMessage',msg=>{
+           console.log("new Message",msg)
+           let p = document.createElement('p')
+           p.innerText = msg.user+" : "+msg.message
+           let chatBox = document.getElementById('chatBox')
+           chatBox.appendChild(p)
+       })
+    </script>
+</head>
+<body>
+    <h1 style="text-align: center;" >My Whatsapp</h1>
+    <div id="chatBox" style="height: 400px; overflow-y: scroll;border: 3px solid black; width: 400px; margin:auto" >
+
+    </div>
+    <div style="display: block; margin: auto; width: 400px;" >
+        <input type="text" id="msgbox" style="font-size: large; width: 319px; display: block; float: left;" />
+    <input type="button"  style="float: left; font-size: large; padding: 0px 6px;" onclick="sendMessage()" value="Send" />
+    </div>
+    
+
+</body>
+</html>
